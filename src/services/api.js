@@ -1,15 +1,67 @@
 import axios from 'axios';
 
-// API Base URL - defaults to Express backend on port 5000 in dev
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Dynamic API Base URL targeting Render backend
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'https://hivemind-backend-xhzq.onrender.com/api';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 8000,
+  timeout: 60000, // 60s timeout for Render free tier cold-start spin-ups
 });
+
+// Cold-start detection event subscriber mechanism
+let activePendingRequests = 0;
+let coldStartTimer = null;
+const listeners = new Set();
+
+const notifyListeners = (isPending) => {
+  listeners.forEach((cb) => cb(isPending));
+};
+
+export const onColdStartChange = (callback) => {
+  listeners.add(callback);
+  return () => listeners.delete(callback);
+};
+
+apiClient.interceptors.request.use(
+  (config) => {
+    activePendingRequests++;
+    if (activePendingRequests === 1 && !coldStartTimer) {
+      coldStartTimer = setTimeout(() => {
+        if (activePendingRequests > 0) {
+          notifyListeners(true);
+        }
+      }, 1500);
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+const handleRequestComplete = () => {
+  activePendingRequests = Math.max(0, activePendingRequests - 1);
+  if (activePendingRequests === 0) {
+    if (coldStartTimer) {
+      clearTimeout(coldStartTimer);
+      coldStartTimer = null;
+    }
+    notifyListeners(false);
+  }
+};
+
+apiClient.interceptors.response.use(
+  (response) => {
+    handleRequestComplete();
+    return response;
+  },
+  (error) => {
+    handleRequestComplete();
+    return Promise.reject(error);
+  }
+);
 
 export const fetchProjects = async (category = 'All', search = '') => {
   try {
@@ -20,7 +72,7 @@ export const fetchProjects = async (category = 'All', search = '') => {
     const response = await apiClient.get('/projects', { params });
     return response.data;
   } catch (error) {
-    console.warn('API connection offline, using client fallback dataset:', error.message);
+    console.warn('API connection offline or delayed, error:', error.message);
     throw error;
   }
 };
@@ -30,7 +82,7 @@ export const fetchTeam = async () => {
     const response = await apiClient.get('/team');
     return response.data;
   } catch (error) {
-    console.warn('API connection offline, using client fallback team dataset:', error.message);
+    console.warn('API connection offline or delayed, error:', error.message);
     throw error;
   }
 };
@@ -46,3 +98,6 @@ export const submitContactForm = async (formData) => {
     throw new Error('Network error. Failed to communicate with Express backend.');
   }
 };
+
+export default apiClient;
+export { apiClient };
