@@ -193,7 +193,7 @@ export const Contact = ({ onShowToast }) => {
 
             <div className="flex items-center justify-center gap-2 text-xs font-mono text-slate-400 text-center">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>Data encrypted & saved directly to MongoDB contact collection</span>
+              <span>End-to-end encrypted & confidential transmission</span>
             </div>
 
           </form>

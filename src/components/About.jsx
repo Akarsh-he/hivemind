@@ -1,13 +1,47 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Network, ShieldCheck, Zap, Award, Target, Users2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { fetchProjects, fetchTeam } from '../services/api';
+import { defaultProjects, defaultTeam } from '../data/mockData';
 
 export const About = () => {
+  const [projectsCount, setProjectsCount] = useState(defaultProjects.length);
+  const [teamCount, setTeamCount] = useState(defaultTeam.length);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const [projRes, teamRes] = await Promise.allSettled([
+          fetchProjects(),
+          fetchTeam()
+        ]);
+
+        if (projRes.status === 'fulfilled' && projRes.value?.data && Array.isArray(projRes.value.data)) {
+          setProjectsCount(projRes.value.data.length);
+        } else if (projRes.status === 'fulfilled' && typeof projRes.value?.count === 'number') {
+          setProjectsCount(projRes.value.count);
+        }
+
+        if (teamRes.status === 'fulfilled' && teamRes.value?.data && Array.isArray(teamRes.value.data)) {
+          setTeamCount(teamRes.value.data.length);
+        } else if (teamRes.status === 'fulfilled' && typeof teamRes.value?.count === 'number') {
+          setTeamCount(teamRes.value.count);
+        }
+      } catch (err) {
+        console.warn('Error fetching backend stats:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadStats();
+  }, []);
+
   const stats = [
-    { label: 'Web Projects Shipped', val: '50+' },
+    { label: 'Projects Built', val: loading ? '...' : `${projectsCount}` },
+    { label: 'Team Members', val: loading ? '...' : `${teamCount}` },
     { label: 'Client Satisfaction', val: '100%' },
     { label: 'Uptime SLA', val: '99.99%' },
-    { label: 'Global Tech Awards', val: '14' },
   ];
 
   return (

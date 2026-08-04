@@ -1,23 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { fetchTeam } from '../services/api';
+import { defaultTeam } from '../data/mockData';
 import { Mail, Sparkles, Users } from 'lucide-react';
 import { GithubIcon, LinkedinIcon, TwitterIcon } from './SocialIcons';
 
 export const Team = () => {
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const loadTeam = async () => {
       try {
         const res = await fetchTeam();
-        if (res && Array.isArray(res.data)) {
+        if (res && Array.isArray(res.data) && res.data.length > 0) {
           setTeamMembers(res.data);
         } else {
-          setTeamMembers([]);
+          setTeamMembers(defaultTeam);
         }
       } catch (err) {
-        setTeamMembers([]);
+        setTeamMembers(defaultTeam);
       } finally {
         setLoading(false);
       }
@@ -25,15 +36,18 @@ export const Team = () => {
     loadTeam();
   }, []);
 
+  const hasMoreMobile = isMobile && teamMembers.length > 10;
+  const displayedMembers = isMobile ? teamMembers.slice(0, 10) : teamMembers;
+
   return (
-    <section id="team" className="py-24 relative bg-[#0a0a0f]">
+    <section id="team" className="py-24 relative bg-[#0a0a0f] overflow-hidden">
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-mono tracking-widest text-[#9d4edd] uppercase px-3 py-1 rounded-full bg-[#9d4edd]/10 border border-[#9d4edd]/20">
-            Engineers & Creators
+            Engineers & Creators {teamMembers.length > 0 ? `(${teamMembers.length})` : ''}
           </span>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white mt-4 tracking-tight">
             Meet the <span className="gradient-text">Hive Minds Team</span>
@@ -43,19 +57,19 @@ export const Team = () => {
           </p>
         </div>
 
-        {/* Team Grid */}
+        {/* Team Single Row Showcase */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="flex flex-row overflow-x-auto overflow-y-hidden gap-6 pb-6 pt-2 horizontal-scrollbar">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="glass-panel h-80 rounded-3xl animate-pulse bg-slate-900/40" />
+              <div key={i} className="glass-panel h-96 rounded-3xl animate-pulse bg-slate-900/40 shrink-0 w-[280px] sm:w-[320px]" />
             ))}
           </div>
         ) : teamMembers.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {teamMembers.map((member) => (
+          <div className="flex flex-row overflow-x-auto overflow-y-hidden gap-6 pb-6 pt-2 snap-x horizontal-scrollbar">
+            {displayedMembers.map((member) => (
               <div
                 key={member._id || member.name}
-                className="glass-panel p-6 rounded-3xl border border-white/10 hover:border-[#9d4edd]/50 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden"
+                className="glass-panel p-6 rounded-3xl border border-white/10 hover:border-[#9d4edd]/50 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden shrink-0 w-[280px] sm:w-[320px] snap-start min-h-[380px]"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#9d4edd]/10 to-transparent rounded-full blur-xl pointer-events-none" />
 
@@ -63,7 +77,7 @@ export const Team = () => {
                   {/* Avatar with Cyber Glow Frame */}
                   <div className="relative w-28 h-28 mx-auto mb-6 rounded-2xl overflow-hidden p-1 bg-gradient-to-tr from-[#00f3ff] via-[#9d4edd] to-[#ff007f] group-hover:shadow-[0_0_20px_rgba(157,78,221,0.5)] transition-shadow">
                     <img
-                      src={member.avatar}
+                      src={member.avatar || member.avatarUrl}
                       alt={member.name}
                       className="w-full h-full object-cover rounded-xl"
                     />
@@ -75,9 +89,9 @@ export const Team = () => {
                       {member.name}
                     </h3>
                     <span className="text-xs font-mono text-[#9d4edd] block mt-1">
-                      {member.role}
+                      {member.role || member.designation}
                     </span>
-                    <p className="text-slate-300 text-xs mt-3 leading-relaxed">
+                    <p className="text-slate-300 text-xs mt-3 leading-relaxed line-clamp-3">
                       {member.bio}
                     </p>
                   </div>
@@ -143,6 +157,27 @@ export const Team = () => {
 
               </div>
             ))}
+
+            {/* Mobile Overflow Ellipsis Card */}
+            {hasMoreMobile && (
+              <div className="glass-panel p-6 rounded-3xl border border-white/10 hover:border-[#00f3ff]/50 transition-all duration-300 flex flex-col items-center justify-center text-center shrink-0 w-[240px] sm:w-[280px] snap-start min-h-[380px] group relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#00f3ff]/10 to-transparent rounded-full blur-xl pointer-events-none" />
+                <div className="w-20 h-20 rounded-2xl p-1 bg-gradient-to-tr from-[#00f3ff] via-[#9d4edd] to-[#ff007f] flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(0,243,255,0.3)] group-hover:scale-105 transition-transform">
+                  <div className="w-full h-full bg-[#0a0a0f] rounded-xl flex items-center justify-center">
+                    <span className="text-3xl font-extrabold font-mono text-[#00f3ff] tracking-widest animate-pulse">...</span>
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-white group-hover:text-[#00f3ff] transition-colors">
+                  +{teamMembers.length - 10} More
+                </h3>
+                <span className="text-xs font-mono text-[#9d4edd] block mt-1">
+                  Team Members
+                </span>
+                <p className="text-slate-400 text-xs mt-3 leading-relaxed">
+                  Additional team members registered in the collective.
+                </p>
+              </div>
+            )}
           </div>
         ) : (
           <div className="glass-panel p-12 text-center rounded-3xl border border-white/10 my-8">
@@ -156,3 +191,4 @@ export const Team = () => {
     </section>
   );
 };
+

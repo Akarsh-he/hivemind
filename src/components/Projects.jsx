@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ProjectCard } from './ProjectCard';
 import { ProjectModal } from './ProjectModal';
 import { fetchProjects } from '../services/api';
+import { defaultProjects } from '../data/mockData';
 import { Search, Filter, Sparkles, FolderGit2 } from 'lucide-react';
 
 export const Projects = () => {
@@ -18,13 +19,19 @@ export const Projects = () => {
       setLoading(true);
       try {
         const res = await fetchProjects(selectedCategory, searchQuery);
-        if (res && Array.isArray(res.data)) {
+        if (res && Array.isArray(res.data) && res.data.length > 0) {
           setProjects(res.data);
+        } else if (selectedCategory === 'All' && !searchQuery) {
+          setProjects(defaultProjects);
         } else {
           setProjects([]);
         }
       } catch (err) {
-        setProjects([]);
+        if (selectedCategory === 'All' && !searchQuery) {
+          setProjects(defaultProjects);
+        } else {
+          setProjects([]);
+        }
       } finally {
         setLoading(false);
       }
@@ -41,8 +48,8 @@ export const Projects = () => {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <span className="text-xs font-mono tracking-widest text-[#00f3ff] uppercase px-3 py-1 rounded-full bg-[#00f3ff]/10 border border-[#00f3ff]/20">
-              Projects Delivered
+            <span className="text-[#00f3ff] text-xs font-mono tracking-widest uppercase px-3 py-1 rounded-full bg-[#00f3ff]/10 border border-[#00f3ff]/20">
+              Projects Delivered {projects.length > 0 ? `(${projects.length})` : ''}
             </span>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-white mt-4 tracking-tight">
               Our Digital <span className="gradient-text">Showcase & Works</span>
