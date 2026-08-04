@@ -17,8 +17,8 @@ export const Footer = () => {
           {/* Col 1: Brand & Tagline */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#00f3ff]/20 to-[#9d4edd]/20 border border-[#00f3ff]/40 flex items-center justify-center">
-                <Hexagon className="w-6 h-6 text-[#00f3ff]" />
+              <div className="w-10 h-10 rounded-xl bg-[#0a0a0f]/90 border border-[#00f3ff]/40 flex items-center justify-center p-1 shadow-[0_0_15px_rgba(0,243,255,0.2)] overflow-hidden">
+                <img src="/logo.png" alt="Hive Minds Logo" className="w-full h-full object-contain" />
               </div>
               <span className="font-bold text-xl text-white font-mono tracking-wider">
                 HIVE<span className="text-[#00f3ff]">MINDS</span>

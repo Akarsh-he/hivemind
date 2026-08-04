@@ -27,9 +27,8 @@ export const Navbar = () => {
         
         {/* Brand Logo */}
         <a href="#" className="flex items-center gap-3 group">
-          <div className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-tr from-[#00f3ff]/20 to-[#9d4edd]/20 border border-[#00f3ff]/40 group-hover:border-[#00f3ff] group-hover:shadow-[0_0_15px_rgba(0,243,255,0.5)] transition-all">
-            <Hexagon className="w-6 h-6 text-[#00f3ff] animate-pulse" />
-            <Sparkles className="w-3 h-3 text-[#9d4edd] absolute -top-1 -right-1" />
+          <div className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-[#0a0a0f]/90 border border-[#00f3ff]/40 group-hover:border-[#00f3ff] group-hover:shadow-[0_0_20px_rgba(0,243,255,0.4)] transition-all overflow-hidden p-1">
+            <img src="/logo.png" alt="Hive Minds Logo" className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(0,243,255,0.4)] group-hover:scale-105 transition-transform" />
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-xl tracking-wider text-white flex items-center gap-1.5 font-mono">

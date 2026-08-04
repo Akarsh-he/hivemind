@@ -34,7 +34,7 @@ export const Hero3D = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-[#00f3ff]/30 text-xs sm:text-sm font-mono text-[#00f3ff] mb-8 pointer-events-auto"
         >
           <Sparkles className="w-4 h-4 text-[#00f3ff] animate-spin" style={{ animationDuration: '6s' }} />
