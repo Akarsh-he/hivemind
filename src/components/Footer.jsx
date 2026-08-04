@@ -34,7 +34,7 @@ export const Footer = () => {
               <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-[#00f3ff] hover:border-[#00f3ff] transition-colors">
                 <LinkedinIcon className="w-4 h-4" />
               </a>
-              <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-[#9d4edd] hover:border-[#9d4edd] transition-colors">
+              <a href="https://x.com/hiveminds_sw" target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-[#9d4edd] hover:border-[#9d4edd] transition-colors">
                 <TwitterIcon className="w-4 h-4" />
               </a>
             </div>
